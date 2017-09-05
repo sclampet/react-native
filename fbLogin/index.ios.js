@@ -4,4 +4,4 @@ import {
 
 import APP from './APP'
 
-AppRegistry.registerComponent('fbLogin', () => App);
+AppRegistry.registerComponent('fbLogin', () => APP);

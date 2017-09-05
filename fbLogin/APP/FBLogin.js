@@ -19,7 +19,7 @@ class FBLogin extends Component {
               } else {
                 AccessToken.getCurrentAccessToken().then(
                   (data) => {
-                    alert(data.accessToken.toString())
+                    alert('Oh snap it worked!')
                   }
                 )
               }
