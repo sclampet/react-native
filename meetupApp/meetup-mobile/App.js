@@ -11,20 +11,31 @@ export default class App extends React.Component {
       loading: false,
       meetups: []
     };
+
   };
 
-  static defaultProps = {
-    fetchMeetups
-  };
+  // static defaultProps = {
+  //   // fetchMeetups
+  // };
 
 
   async componentDidMount() {
-    this.setState = ({ loading: true });
-    const data = await this.props.fetchMeetups();
-    setTimeout(() => this.setState({ loading: false, meetups: data.meetups }), 2000);
+    this.setState({ loading: true });
+    fetchMeetups()
+      .then((res) => {
+        this.setState({
+          loading: false,
+          meetups: res.meetups
+        });
+        console.log('meetups: ' + this.state.meetups);
+      });
   };
 
   render() {
+    const meetups = this.state.meetups.map((meetup, i) => {
+      <Text key={i}>{meetup.title}</Text>
+    });
+
     if(this.state.loading) {
       return (
         <View style={styles.container}>
@@ -32,10 +43,10 @@ export default class App extends React.Component {
         </View>
       )
     }
-
     return (
       <View style={styles.container}>
         <Text>Meetup!</Text>
+        {meetups}
       </View>
     );
   }
