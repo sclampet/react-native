@@ -1,4 +1,6 @@
 const Group = require('../models/GroupModel');
+const Meetup = require('../models/MeetupModel');
+
 
 module.exports = {
   async createGroup(req, res) {
@@ -57,10 +59,35 @@ module.exports = {
     }
 
     try {
-      const [meetup, group] = await Group.addMeetup(groupId, { title, description });
+      const { meetup, group } = await Group.addMeetup(groupId, { title, description });
+
       return res.status(201).json({ error: false, meetup, group });
     } catch (e) {
       return res.status(400).json({ error: true, message: 'GroupId bust be provided' });
+    }
+  },
+
+  async getGroupMeetups(req, res) {
+    const { groupId } = req.params;
+
+    if (!groupId) {
+      return res.status(400).json({ error: true, message: 'You need to proved a group id' });
+    }
+
+    // Search to see if group exists
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(400).json({ error: true, message: 'This group does not exist' });
+    }
+
+    try {
+      return res.status(201).json({
+        error: false,
+        meetups: await Meetup.find({ group: groupId }).populate('group', 'name'),
+      });
+    } catch (e) {
+      return res.status(400).json({ error: true, message: 'Cannot fetch meetups' });
     }
   },
 };

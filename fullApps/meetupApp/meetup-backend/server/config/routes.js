@@ -8,5 +8,6 @@ module.exports = function (app) {
     .post('/meetups', MeetupController.createMeetup)
     .get('/meetups', MeetupController.findAllMeetups)
     .post('/groups/new', GroupController.createGroup)
-    .post('/groups/:groupId/meetups/new', GroupController.createGroupMeetup);
+    .post('/groups/:groupId/meetups/new', GroupController.createGroupMeetup)
+    .get('/groups/:groupId/meetups', GroupController.getGroupMeetups);
 };
