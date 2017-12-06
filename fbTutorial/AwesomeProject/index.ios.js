@@ -45,6 +45,7 @@ export default class AwesomeProject extends Component {
           dataSource: this.state.dataSource.cloneWithRows(responseData.movies),
           loaded: true,
         });
+        console.log("dataSource: " + this.state.dataSource);
       })
       .done();
   }
