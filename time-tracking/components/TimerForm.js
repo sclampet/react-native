@@ -4,7 +4,20 @@ import { View, Text, StyleSheet, TextInput } from 'react-native';
 
 import TimerButton from './TimerButton';
 
-export default class TimerForm extends React.Component {
+export default class TimerForm extends Component {
+    static propTypes = {
+        id: PropTypes.string,
+        title: PropTypes.string,
+        project: PropTypes.string,
+        onFormSubmit: PropTypes.func.isRequired,
+        onFormClose: PropTypes.func.isRequired,
+    };
+    static defaultProps = {
+        id: null,
+        title: '',
+        project: '',
+    };
+
     constructor(props) {
         super(props);
         const { id, title, project } = props;
