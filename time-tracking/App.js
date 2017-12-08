@@ -3,32 +3,99 @@ import {
   StyleSheet, 
   Text, 
   View,
-  ScrollView, 
+  ScrollView,
+  KeyboardAvoidingView
 } from 'react-native';
 import uuidv4 from 'uuid/v4';
+import { newTimer } from './utils/TimerUtils';
 
 import EditableTimer from './components/EditableTimer';
 import ToggleableTimerForm from './components/ToggleableTimerForm';
 
 export default class App extends React.Component {
   state = {
-    timers: [
-      {
-        title: 'Mow the lawn',
-        project: 'House Chores',
-        id: uuidv4(),
-        elapsed: 5424389,
-        isRunning: true,
-      },
-      {
-        title: 'Bake Squash',
-        project: 'Kitchen Chores',
-        id: uuidv4(),
-        elapsed: 34543456,
-        isRunning: false,
-      },
-    ]
+    timers: [],
   }
+
+  componentDidMount() {
+    const TIME_INTERVAL = 1000;
+
+    this.intervalId = setInterval(() => {
+      const { timers } = this.state;
+
+      this.setState({
+        timers: timers.map(timer => {
+          const { elapsed, isRunning } = timer;
+
+          return {
+            ...timer,
+            elapsed: isRunning ? elapsed + TIME_INTERVAL : elapsed,
+          };
+        }),
+      });
+    }, TIME_INTERVAL);
+  }
+
+  //fires just before a component is unmounted (deleted).
+  componentWillUnmount() {
+    clearInterval(this.intervalId);
+  }
+  
+
+  //handles creating timers. will be passed to ToggleableTimerForm
+  handleCreateFormSubmit = timer => {
+    const { timers } = this.state;
+
+    this.setState({
+      timers: [newTimer(timer), ...timers],
+    });
+  };
+  
+  //handles updating timers. will be passed to EditableTimer
+  handleFormSubmit = attrs => {
+    const { timers } = this.state;
+
+    this.setState({
+      timers: timers.map(timer => {
+        if(timer.id === attrs.id) {
+          const {title, project } = attrs;
+
+          return {
+            ...timers,
+            title,
+            project,
+          };
+        }
+        return timer;
+      })
+    })
+  };
+
+  handleRemovePress = timerId => {
+    this.setState({
+      timers: this.state.timers.filter(t => t.id !== timerId),
+    });
+  }
+
+  toggleTimer = timerId => {
+    this.setState(prevState => {
+      const{ timers } = prevState;
+
+      return {
+        timers: timers.map(timer => {
+          const { id, isRunning } = timer;
+
+          if(id === timerId) {
+            return {
+              ...timer,
+              isRunning: !isRunning,
+            };
+          }
+          return timer;
+        }),
+      };
+    });
+  };
 
   render() {
     const { timers } = this.state;
@@ -38,19 +105,28 @@ export default class App extends React.Component {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Timers</Text>
         </View>
-        <ScrollView style={styles.timerList}>
-          <ToggleableTimerForm />
-          {timers.map(({ title, project, id, elapsed, isRunning }) => (
-            <EditableTimer
-              key={id}
-              id={id}
-              title={title}
-              project={project}
-              elapsed={elapsed}
-              isRunning={isRunning}
-            />
-          ))}
-        </ScrollView>
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={styles.timerListContainer}
+        >
+          <ScrollView style={styles.timerList}>
+            <ToggleableTimerForm  onFormSubmit={this.handleCreateFormSubmit} />
+            {timers.map(({ title, project, id, elapsed, isRunning }) => (
+              <EditableTimer
+                key={id}
+                id={id}
+                title={title}
+                project={project}
+                elapsed={elapsed}
+                isRunning={isRunning}
+                onFormSubmit={this.handleFormSubmit}
+                onRemovePress={this.handleRemovePress}
+                onStartPress={this.toggleTimer}
+                onStopPress= {this.toggleTimer}
+              />
+            ))}
+          </ScrollView>
+        </KeyboardAvoidingView>
       </View>
     );
   }
@@ -73,5 +149,8 @@ const styles = StyleSheet.create({
   },
   timerList: {
     paddingBottom: 15,
+  },
+  timerListContainer: {
+    flex: 1,
   },
 });
