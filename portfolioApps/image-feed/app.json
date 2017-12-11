@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "Image Feed",
+    "slug": "image-feed",
+    "sdkVersion": "23.0.0",
+    "orientation": "portrait"
+  }
+}
