@@ -1,26 +1,29 @@
-import React, { Component } from 'react';
-import { 
+import {
   Alert,
-  StyleSheet, 
-  Text, 
-  View,
+  BackHandler,
   Image,
+  StyleSheet,
   TouchableHighlight,
+  View,
 } from 'react-native';
+import React from 'react';
 
-import Status from './components/Status';
-import MessageList from './components/MessageList';
-import Toolbar from './components/Toolbar';
-import ImageGrid from './components/ImageGrid';
-
-import { 
-  createImageMessage, 
-  createLocationMessage, 
-  createTextMessage 
+import {
+  createImageMessage,
+  createLocationMessage,
+  createTextMessage,
 } from './utils/MessageUtils';
+import ImageGrid from './components/ImageGrid';
+import KeyboardState from './components/KeyboardState';
+import MeasureLayout from './components/MeasureLayout';
+import MessageList from './components/MessageList';
+import MessagingContainer, {
+  INPUT_METHOD,
+} from './components/MessagingContainer';
+import Status from './components/Status';
+import Toolbar from './components/Toolbar';
 
-
-export default class App extends Component {
+export default class App extends React.Component {
   state = {
     messages: [
       createImageMessage('https://unsplash.it/300/300'),
@@ -33,17 +36,45 @@ export default class App extends Component {
     ],
     fullscreenImageId: null,
     isInputFocused: false,
+    inputMethod: INPUT_METHOD.NONE,
+  };
+
+  componentWillMount() {
+    this.subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => {
+        const { fullscreenImageId } = this.state;
+
+        if (fullscreenImageId) {
+          this.dismissFullscreenImage();
+          return true;
+        }
+
+        return false;
+      },
+    );
+  }
+
+  componentWillUnmount() {
+    this.subscription.remove();
+  }
+
+  dismissFullscreenImage = () => {
+    this.setState({ fullscreenImageId: null });
   };
 
   handlePressToolbarCamera = () => {
-
+    this.setState({
+      isInputFocused: false,
+      inputMethod: INPUT_METHOD.CUSTOM,
+    });
   };
 
   handlePressToolbarLocation = () => {
     const { messages } = this.state;
 
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { coords: {latitude, longitude } } = position;
+    navigator.geolocation.getCurrentPosition(position => {
+      const { coords: { latitude, longitude } } = position;
 
       this.setState({
         messages: [
@@ -57,11 +88,15 @@ export default class App extends Component {
     });
   };
 
-  handleChangeFocus = (isFocused) => {
-    this.setState({ isInputFocused: isFocused });
-  }
+  handlePressImage = uri => {
+    const { messages } = this.state;
 
-  handleSubmit = (text) => {
+    this.setState({
+      messages: [createImageMessage(uri), ...messages],
+    });
+  };
+
+  handleSubmit = text => {
     const { messages } = this.state;
 
     this.setState({
@@ -69,27 +104,19 @@ export default class App extends Component {
     });
   };
 
-    renderToolBar() {
-      const { isInputFocused } = this.state;
+  handleChangeFocus = isFocused => {
+    this.setState({ isInputFocused: isFocused });
+  };
 
-      return (
-        <View style={styles.toolbar}>
-          <Toolbar
-            isFocused={isInputFocused}
-            onSubmit={this.handleSubmit}
-            onChangeFocus={this.handleChangeFocus}
-            onPressCamera={this.handlePressToolbarCamera}
-            onPressLocation={this.handlePressToolbarLocation}
-          />
-        </View>
-      );
-    };
+  handleChangeInputMethod = inputMethod => {
+    this.setState({ inputMethod });
+  };
 
-  handlePressMessage  = ({ id, type }) => {
-    switch(type) {
+  handlePressMessage = ({ id, type }) => {
+    switch (type) {
       case 'text':
         Alert.alert(
-          'Delete Message?',
+          'Delete message?',
           'Are you sure you want to permanently delete this message?',
           [
             {
@@ -101,29 +128,20 @@ export default class App extends Component {
               style: 'destructive',
               onPress: () => {
                 const { messages } = this.state;
-                this.setState({ messages: messages.filter(message => message.id !== id)});
+                this.setState({
+                  messages: messages.filter(message => message.id !== id),
+                });
               },
             },
           ],
         );
+        break;
       case 'image':
         this.setState({ fullscreenImageId: id, isInputFocused: false });
-          break;
-        default:
-          break;
+        break;
+      default:
+        break;
     }
-  };
-
-  handlePressImage = (uri) => {
-    const { messages } = this.state;
-
-    this.setState({
-      messages: [createImageMessage(uri), ...messages],
-    });
-  };
-
-  dismissFullscreenImage = () => {
-    this.setState({ fullscreenImageId: null });
   };
 
   renderMessageList() {
@@ -131,57 +149,90 @@ export default class App extends Component {
 
     return (
       <View style={styles.content}>
-        <MessageList messages={messages} onPressMessage={this.handlePressMessage} />
+        <MessageList
+          messages={messages}
+          onPressMessage={this.handlePressMessage}
+        />
       </View>
     );
-  };
+  }
 
-  renderInputMethodEditor() {
+  renderToolbar() {
+    const { isInputFocused } = this.state;
+
     return (
-      <View style={styles.inputMethodEditor}>
-        <ImageGrid onPressImage={this.handlePressImage} />
+      <View style={styles.toolbar}>
+        <Toolbar
+          isFocused={isInputFocused}
+          onSubmit={this.handleSubmit}
+          onChangeFocus={this.handleChangeFocus}
+          onPressCamera={this.handlePressToolbarCamera}
+          onPressLocation={this.handlePressToolbarLocation}
+        />
       </View>
     );
-  };
+  }
 
+  renderInputMethodEditor = () => (
+    <View style={styles.inputMethodEditor}>
+      <ImageGrid onPressImage={this.handlePressImage} />
+    </View>
+  );
 
   renderFullscreenImage = () => {
     const { messages, fullscreenImageId } = this.state;
 
-    if(!fullscreenImageId) return null;
+    if (!fullscreenImageId) return null;
 
     const image = messages.find(message => message.id === fullscreenImageId);
 
-    if(!image) return null;
+    if (!image) return null;
 
     const { uri } = image;
 
     return (
-      <TouchableHighlight style={styles.fullscreenOverlay} onPress={this.dismissFullscreenImage}>
+      <TouchableHighlight
+        style={styles.fullscreenOverlay}
+        onPress={this.dismissFullscreenImage}
+      >
         <Image style={styles.fullscreenImage} source={{ uri }} />
       </TouchableHighlight>
     );
   };
 
-
   render() {
+    const { inputMethod } = this.state;
+
     return (
       <View style={styles.container}>
         <Status />
-        {this.renderMessageList()}
-        {this.renderToolBar()}
-        {this.renderInputMethodEditor()}
+        <MeasureLayout>
+          {layout => (
+            <KeyboardState layout={layout}>
+              {keyboardInfo => (
+                <MessagingContainer
+                  {...keyboardInfo}
+                  inputMethod={inputMethod}
+                  onChangeInputMethod={this.handleChangeInputMethod}
+                  renderInputMethodEditor={this.renderInputMethodEditor}
+                >
+                  {this.renderMessageList()}
+                  {this.renderToolbar()}
+                </MessagingContainer>
+              )}
+            </KeyboardState>
+          )}
+        </MeasureLayout>
         {this.renderFullscreenImage()}
       </View>
     );
-  };
+  }
 }
-
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
   content: {
     flex: 1,
@@ -197,9 +248,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   fullscreenOverlay: {
-    ...StyleSheet.absoluteFillObject, //overlay background fills entire screen
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'black',
-    zIndex: 2, //cover all other UI
+    zIndex: 2,
   },
   fullscreenImage: {
     flex: 1,
