@@ -17,17 +17,41 @@ class AlarmSettings extends Component {
     
 
     state = {
-        chosenTime: new Date(),
+        chosenTime: new Date(this.props.currentAlarm),
+        isEditOpen: false,
     };
-    
 
-    setAlarm = (newTime) => {
-        console.log('Time Change ', newTime)
-        this.setState({chosenTime: newTime});
-    };
+    renderAlarm = () => {
+        const { chosenTime, list } = this.state;
+
+        if(this.state.isEditOpen) {
+            return (
+                <View>
+                    <View style={[styles.section, styles.alarmClock]}>
+                        <Picker chosenTime={chosenTime} setTime={this.setAlarm} />
+                    </View>
+                    <View>
+                        <Text onPress={this.saveAlarm}>Save</Text>
+                        <Text onPress={this.closePicker}>Cancel</Text>
+                    </View>
+                </View>
+            )
+        }
+
+        return (
+            <View>
+                <View style={[styles.section, styles.alarmClock]}>
+                    <Text>Alarm Clock: {this.props.currentAlarm}</Text>
+                </View>
+                <View>
+                    <Text onPress={this.editAlarm}>Edit</Text>
+                </View>
+            </View>
+        )
+    }
 
     renderRow = (rowData, sectionID) => {
-        const list = [
+        const settingsList = [
             {
                 title: 'Sounds',
                 currentSelection: 'Ring',
@@ -37,19 +61,55 @@ class AlarmSettings extends Component {
                 currentSelection: '.25',
             },
         ]
+        if(this.state.isEditOpen) {
+            return (
+                settingsList.map((item, i) => (
+                    <View key={i} style={[styles.row, styles.section]}>
+                        <Text style={styles.rowText}>
+                            {item.title}
+                        </Text>
+                        <Text style={styles.rowSelection}>
+                            {item.currentSelection}
+                        </Text>
+                    </View>
+                ))
+            );
+        }
+
         return (
-            list.map((item, i) => (
-                <View key={i} style={[styles.row, styles.section]}>
+            <View>
+                <View style={[styles.row, styles.section]}>
                     <Text style={styles.rowText}>
-                        {item.title}
-                    </Text>
-                    <Text style={styles.rowSelection}>
-                        {item.currentSelection}
+                        Total # of times you've Snüzed: ____
                     </Text>
                 </View>
-            ))
-        );
-    } ;
+                <View style={[styles.row, styles.section]}>
+                    <Text style={styles.rowText}>
+                        Total Snüzes by all users: ____
+                    </Text>
+                </View>
+            </View>
+        )
+    };
+
+    setAlarm = (newTime) => {
+        console.log('Time Change ', newTime)
+        this.setState({ chosenTime: newTime });
+    };
+
+    editAlarm = () => {
+        this.setState({isEditOpen: true});
+    };
+
+    saveAlarm = () => {
+        console.log('Saving alarm and sending time to App.js')
+        this.props.setAlarm(this.state.chosenTime);
+        this.setState({isEditOpen: false});
+    };
+
+    closePicker = () => {
+        this.setState({ isEditOpen: false });
+    }
 
 
     render() {
@@ -61,9 +121,7 @@ class AlarmSettings extends Component {
                 <View style={{height: 50, width: 200}}>
                     <Text>New Time: {String(chosenTime)}</Text>
                 </View>
-                <View style={[styles.section, styles.alarmClock]}>
-                    <Picker chosenTime={chosenTime} setTime={this.setAlarm} />
-                </View>
+                {this.renderAlarm()}
                 {this.renderRow()}
             </View>
         );
