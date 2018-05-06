@@ -3,6 +3,7 @@ import {
     DatePickerIOS,
     View,
     StyleSheet,
+    Dimensions,
 } from 'react-native'
 
 export default class Picker extends Component {
@@ -33,9 +34,14 @@ export default class Picker extends Component {
     }
 }
 
+const width = Dimensions.get('window').width; //full width
+
+
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        // flex: 1,
+        height: 100,
+        width: width,
         justifyContent: 'center'
     },
 })

@@ -7,8 +7,10 @@ import {
     List, 
     ListItem, 
     ListView,
-    Dimensions
+    Dimensions,
+    TouchableHighlight,
 } from 'react-native';
+import colors from '../../../utils/colors';
 
 import Picker from './picker/Picker';
 
@@ -17,18 +19,33 @@ class AlarmSettings extends Component {
     
 
     state = {
-        chosenTime: new Date(this.props.currentAlarm),
         isEditOpen: false,
     };
 
-    renderAlarm = () => {
+    render() {
         const { chosenTime, list } = this.state;
 
+
+        return (
+            <View style={styles.container}>
+                <View style={{height: 50, width: 200}}>
+                    <Text>New Time: {String(chosenTime)}</Text>
+                </View>
+                {this.renderAlarm()}
+                {this.renderRow()}
+            </View>
+        );
+    }
+
+    renderAlarm = () => {
+        const { userInfo } = this.props;
+        const currentAlarm = userInfo.currentAlarm;
+        console.log('Current Alarm from user ', currentAlarm)
         if(this.state.isEditOpen) {
             return (
                 <View>
                     <View style={[styles.section, styles.alarmClock]}>
-                        <Picker chosenTime={chosenTime} setTime={this.setAlarm} />
+                        <Picker currentAlarm={currentAlarm} setTime={this.setAlarm} />
                     </View>
                     <View>
                         <Text onPress={this.saveAlarm}>Save</Text>
@@ -41,7 +58,7 @@ class AlarmSettings extends Component {
         return (
             <View>
                 <View style={[styles.section, styles.alarmClock]}>
-                    <Text>Alarm Clock: {this.props.currentAlarm}</Text>
+                    <Text>Alarm Clock: {userInfo.currentAlarm}</Text>
                 </View>
                 <View>
                     <Text onPress={this.editAlarm}>Edit</Text>
@@ -50,46 +67,39 @@ class AlarmSettings extends Component {
         )
     }
 
-    renderRow = (rowData, sectionID) => {
-        const settingsList = [
-            {
-                title: 'Sounds',
-                currentSelection: 'Ring',
-            },
-            {
-                title: 'Snüze Amount',
-                currentSelection: '.25',
-            },
-        ]
-        if(this.state.isEditOpen) {
-            return (
-                settingsList.map((item, i) => (
-                    <View key={i} style={[styles.row, styles.section]}>
-                        <Text style={styles.rowText}>
-                            {item.title}
-                        </Text>
-                        <Text style={styles.rowSelection}>
-                            {item.currentSelection}
-                        </Text>
-                    </View>
-                ))
-            );
-        }
-
+    renderRow = () => {
+        const { isEditOpen } = this.state;
+        const { onSoundPress } = this.props;
         return (
             <View>
-                <View style={[styles.row, styles.section]}>
-                    <Text style={styles.rowText}>
-                        Total # of times you've Snüzed: ____
-                    </Text>
-                </View>
-                <View style={[styles.row, styles.section]}>
-                    <Text style={styles.rowText}>
-                        Total Snüzes by all users: ____
-                    </Text>
-                </View>
-            </View>
-        )
+                {isEditOpen &&
+                    <TouchableHighlight
+                        underlayColor={colors.grey}
+                        style={styles.toucheableHighlight}
+                        onPress={onSoundPress}
+                    >
+                        <View style={styles.alarmInfo}>
+                            <View style={styles.rows}>
+                                <Text style={[styles.title]}>Sounds</Text>
+                                <Text style={[styles.toucheableValue]}>Ring</Text>
+                            </View>
+                        </View>
+                    </TouchableHighlight>
+                }
+                {!isEditOpen &&
+                    <View style={styles.alarmInfo}>
+                        <View style={styles.rows}>
+                            <Text style={[styles.title]}>Total Snüzes</Text>
+                            <Text style={[styles.value]}>100</Text>
+                        </View>
+                        <View style={styles.rows}>
+                            <Text style={[styles.title]}>Total Donated by all Snüzers</Text>
+                            <Text style={[styles.value]}>20000</Text>
+                        </View>
+                    </View>
+                }
+        </View>
+        );
     };
 
     setAlarm = (newTime) => {
@@ -112,33 +122,57 @@ class AlarmSettings extends Component {
     }
 
 
-    render() {
-        const { chosenTime, list } = this.state;
-
-
-        return (
-            <View style={styles.container}>
-                <View style={{height: 50, width: 200}}>
-                    <Text>New Time: {String(chosenTime)}</Text>
-                </View>
-                {this.renderAlarm()}
-                {this.renderRow()}
-            </View>
-        );
-    }
 }
 const width = Dimensions.get('window').width; //full width
-const height = Dimensions.get('window').height; //full heigt
+const height = Dimensions.get('window').height; //full height
 // define your styles
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
         width: width,
+        paddingLeft: 24,
+
+    },
+    toucheableHighlight: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        height: 100,
+        width: width,
+        paddingLeft: 24,
+    },
+    alarmInfo: {
+        flex: .5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        paddingTop: 16,
+        paddingBottom: 16,
+        paddingRight: 24,
+        borderBottomColor: colors.grey,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+    },
+    rows: {
+        justifyContent: 'flex-start',
+        height: 40,
+        marginLeft: 20,
+    },
+    title: {
+        color: colors.black,
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
+    toucheableValue: {
+        color: colors.blue,
+        fontSize: 15,
+        marginTop: 4,
+    },
+    value: {
+        color: colors.black,
+        fontSize: 15,
+        marginTop: 4,
     },
     section: {
-        flex: 0,
-        height: 55,
         width: width,
         flexDirection: 'row',
         justifyContent: 'flex-start',
@@ -157,25 +191,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center', 
         alignItems: 'center', 
     },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center', 
-        top: 100,
-        paddingLeft: 20,
-        paddingRight: 20,
-        borderColor: 'grey',
-        borderWidth: .3,
-    },
-    rowText: {
-        flex: 1,
-        justifyContent: 'flex-start',
-    },
-    rowSelection: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        left: 130,
-    }
 });
 
 //make this component available to the app
