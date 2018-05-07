@@ -39,62 +39,71 @@ class AlarmSettings extends Component {
 
     renderAlarm = () => {
         const { userInfo } = this.props;
+        const { isEditOpen } = this.state;
         const currentAlarm = userInfo.currentAlarm;
         console.log('Current Alarm from user ', currentAlarm)
-        if(this.state.isEditOpen) {
-            return (
-                <View>
-                    <View style={[styles.section, styles.alarmClock]}>
-                        <Picker currentAlarm={currentAlarm} setTime={this.setAlarm} />
-                    </View>
-                    <View>
-                        <Text onPress={this.saveAlarm}>Save</Text>
-                        <Text onPress={this.closePicker}>Cancel</Text>
-                    </View>
-                </View>
-            )
-        }
 
         return (
             <View>
-                <View style={[styles.section, styles.alarmClock]}>
-                    <Text>Alarm Clock: {userInfo.currentAlarm}</Text>
-                </View>
-                <View>
-                    <Text onPress={this.editAlarm}>Edit</Text>
-                </View>
+                {isEditOpen &&
+                    <View>
+                        <View style={[styles.section, styles.alarmClock]}>
+                            <Picker currentAlarm={currentAlarm} setTime={this.setAlarm} />
+                        </View>
+                        <View>
+                            <Text onPress={this.saveAlarm}>Save</Text>
+                            <Text onPress={this.closePicker}>Cancel</Text>
+                        </View>
+                    </View>
+                }
+                {!isEditOpen &&
+                    <View>
+                        <View style={[styles.section, styles.alarmClock]}>
+                            <Text>Alarm Clock: {userInfo.currentAlarm}</Text>
+                        </View>
+                        <View>
+                            <Text onPress={this.editAlarm}>Edit</Text>
+                        </View>
+                    </View>
+                }
             </View>
-        )
+        );
     }
 
     renderRow = () => {
         const { isEditOpen } = this.state;
-        const { onSoundPress } = this.props;
+        const { onSoundPress, userInfo, snuzeInfo } = this.props;
         return (
             <View>
                 {isEditOpen &&
-                    <TouchableHighlight
-                        underlayColor={colors.grey}
-                        style={styles.toucheableHighlight}
-                        onPress={onSoundPress}
-                    >
+                    <View>
+                        <TouchableHighlight
+                            underlayColor={colors.grey}
+                            style={styles.toucheableHighlight}
+                            onPress={onSoundPress}
+                        >
                         <View style={styles.alarmInfo}>
                             <View style={styles.rows}>
                                 <Text style={[styles.title]}>Sounds</Text>
-                                <Text style={[styles.toucheableValue]}>Ring</Text>
+                                <Text style={[styles.toucheableValue]}>{userInfo.sound}</Text>
                             </View>
                         </View>
-                    </TouchableHighlight>
+                        </TouchableHighlight>
+                        <View style={styles.alarmInfo}>
+                            <Text style={[styles.title]}>Snüze Amount </Text>
+                            <Text style={[styles.value]}>{userInfo.amountToSnuze}</Text>
+                        </View>
+                    </View>
                 }
                 {!isEditOpen &&
                     <View style={styles.alarmInfo}>
                         <View style={styles.rows}>
                             <Text style={[styles.title]}>Total Snüzes</Text>
-                            <Text style={[styles.value]}>100</Text>
+                            <Text style={[styles.value]}>{userInfo.totalSnuzes}</Text>
                         </View>
                         <View style={styles.rows}>
                             <Text style={[styles.title]}>Total Donated by all Snüzers</Text>
-                            <Text style={[styles.value]}>20000</Text>
+                            <Text style={[styles.value]}>{snuzeInfo.totalDonated}</Text>
                         </View>
                     </View>
                 }

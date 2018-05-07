@@ -44,6 +44,7 @@ class Alarm extends Component {
         this.unsubscribe = store.onChange(() =>
             this.setState({
                 user: store.getState().user,
+                snuzeInfo: store.getState().snuzeInfo,
                 loading: store.getState().isFetchingUser,
                 error: store.getState().error,
             }));
@@ -67,12 +68,13 @@ class Alarm extends Component {
                     //     });
                     // };
         };
-
+    
+    //navigate to Sounds selection list
     onSoundPress = () => { navigate('Sounds', { id }) };
                 
                 
                 render() {
-                    const { user, loading, error } = this.state;
+                    const { user, snuzeInfo, loading, error } = this.state;
                     
                     return (
                         <View style={styles.container}>
@@ -82,6 +84,7 @@ class Alarm extends Component {
                                 !error && (
                                     <AlarmSettings 
                                         userInfo={user} 
+                                        snuzeInfo={snuzeInfo}
                                         setAlarm={this.setAlarm}
                                         onSoundPress={this.onSoundPress}
                                     />

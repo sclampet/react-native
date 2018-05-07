@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import moment from 'moment';
 
-import Alarm from './src/screens/Alarm';
+import { Alarm, Sounds } from './src/screens';
 import { AlarmSettings, Analytics } from './src/components/body';
 import Header from './src/components/header/Header';
 
@@ -16,7 +16,8 @@ export default class App extends React.Component {
     const { currentAlarm } = this.state;
     return (
       <View style={styles.container}>
-        <Alarm />
+        {/* <Alarm /> */}
+        <Sounds />
       </View>
     );
   }

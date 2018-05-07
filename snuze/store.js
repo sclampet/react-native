@@ -1,15 +1,21 @@
 let state = {
     isFetchingSnuzeInfo: true,
     isFetchingUser: true,
+    isFetchingSounds: true,
     user: {
         name: 'Scott C',
         currentAlarm: '5:00 AM',
         amountToSnuze: .25,
         sound: 'Ring',
+        totalSnuzes: 20,
     },
     snuzeInfo: {
         totalDonated: 500,
     },
+    sounds: [
+        { id: '1', title: 'Ring Ring' },
+        { id: '2', title: 'Buzz Buzz' },
+    ],
     error: false,
 };
 
