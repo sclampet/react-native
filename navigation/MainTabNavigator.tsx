@@ -3,7 +3,7 @@ import { Pressable } from "react-native";
 import { FontAwesome, Fontisto } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
-import TabOneScreen from "../screens/TabOneScreen";
+import ChatsScreen from "../screens/ChatsScreen";
 import TabTwoScreen from "../screens/TabTwoScreen";
 import { MainTabParamList, RootTabScreenProps } from "../types";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
@@ -32,7 +32,7 @@ export default function MainTabNavigator() {
     >
       <MainTab.Screen
         name="Camera"
-        component={TabOneScreen}
+        component={ChatsScreen}
         options={{
           tabBarShowLabel: false,
           tabBarIcon: ({ color }) => (
@@ -42,7 +42,7 @@ export default function MainTabNavigator() {
       />
       <MainTab.Screen
         name="Chats"
-        component={TabTwoScreen}
+        component={ChatsScreen}
         options={{
           title: "Chats",
         }}
