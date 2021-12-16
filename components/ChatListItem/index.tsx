@@ -1,8 +1,9 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import { ChatRoom } from "../../types";
 import moment from "moment";
 import styles from "./style";
+import { useNavigation } from "@react-navigation/native";
 
 export type ChatListItem = {
   chatRoom: ChatRoom;
@@ -13,8 +14,14 @@ const ChatListItem = (props: ChatListItem) => {
   // Assuming that the second user is the primary user for now
   const user = chatRoom.users[1];
 
+  const navigation = useNavigation();
+
+  const onPress = () => {
+    navigation.navigate("ChatRoom", { id: chatRoom.id, name: user.name });
+  };
+
   return (
-    <View style={styles.container}>
+    <Pressable onPress={onPress} style={styles.container}>
       <View style={styles.leftContainer}>
         <Image source={{ uri: user.imageUri }} style={styles.avatar} />
 
@@ -27,7 +34,7 @@ const ChatListItem = (props: ChatListItem) => {
       </View>
 
       <Text style={styles.time}>{moment(new Date()).format("DD/MM/YYYY")}</Text>
-    </View>
+    </Pressable>
   );
 };
 

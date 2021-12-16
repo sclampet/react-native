@@ -7,6 +7,8 @@ import {
   FontAwesome,
   Octicons,
   MaterialCommunityIcons,
+  MaterialIcons,
+  FontAwesome5,
 } from "@expo/vector-icons";
 import {
   NavigationContainer,
@@ -15,15 +17,15 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { ColorSchemeName, Text } from "react-native";
+import { ColorSchemeName, Text, Pressable } from "react-native";
 
-import ModalScreen from "../screens/ModalScreen";
-import NotFoundScreen from "../screens/NotFoundScreen";
 import { RootStackParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import MainTabNavigator from "./MainTabNavigator";
 import Colors from "../constants/Colors";
 import { View } from "../components/Themed";
+import ChatRoom from "../screens/ChatRoomScreen";
+import ChatRoomScreen from "../screens/ChatRoomScreen";
 
 export default function Navigation({
   colorScheme,
@@ -87,13 +89,36 @@ function RootNavigator() {
         }}
       />
       <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ title: "Oops!" }}
+        name="ChatRoom"
+        component={ChatRoomScreen}
+        options={({ route }) => ({
+          title: route.params.name,
+          headerRight: () => (
+            <View
+              style={{
+                width: 100,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: "transparent",
+              }}
+            >
+              <Pressable onPress={() => console.warn("video icon pressed")}>
+                <FontAwesome5 name="video" size={22} color="#fff" />
+              </Pressable>
+              <Pressable onPress={() => console.warn("call icon pressed")}>
+                <MaterialIcons name="call" size={22} color="#fff" />
+              </Pressable>
+              <Pressable onPress={() => console.warn("dots icon pressed")}>
+                <MaterialCommunityIcons
+                  name="dots-vertical"
+                  size={22}
+                  color="#fff"
+                />
+              </Pressable>
+            </View>
+          ),
+        })}
       />
-      <Stack.Group screenOptions={{ presentation: "modal" }}>
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
     </Stack.Navigator>
   );
 }
