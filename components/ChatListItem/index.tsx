@@ -33,7 +33,9 @@ const ChatListItem = (props: ChatListItem) => {
         </View>
       </View>
 
-      <Text style={styles.time}>{moment(new Date()).format("DD/MM/YYYY")}</Text>
+      <Text style={styles.time}>
+        {moment(chatRoom.lastMessage.createdAt).format("DD/MM/YYYY")}
+      </Text>
     </Pressable>
   );
 };
