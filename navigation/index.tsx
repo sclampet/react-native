@@ -26,6 +26,7 @@ import Colors from "../constants/Colors";
 import { View } from "../components/Themed";
 import ChatRoom from "../screens/ChatRoomScreen";
 import ChatRoomScreen from "../screens/ChatRoomScreen";
+import ContactsScreen from "../screens/ContactsScreen";
 
 export default function Navigation({
   colorScheme,
@@ -119,6 +120,7 @@ function RootNavigator() {
           ),
         })}
       />
+      <Stack.Screen name="Contacts" component={ContactsScreen} />
     </Stack.Navigator>
   );
 }
