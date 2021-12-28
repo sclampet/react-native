@@ -9,6 +9,7 @@ import { listUsers } from "../src/graphql/queries";
 export default function ContactsScreen() {
   const [users, setUsers] = useState([]);
 
+  //Get all users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
