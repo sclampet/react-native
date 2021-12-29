@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Image, Pressable } from "react-native";
 import { User } from "../../types";
-import moment from "moment";
 import styles from "./style";
 import { useNavigation } from "@react-navigation/native";
 import { API, Auth, graphqlOperation } from "aws-amplify";

@@ -3,7 +3,7 @@ import { Pressable } from "react-native";
 import { FontAwesome, Fontisto } from "@expo/vector-icons";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
-import ChatsScreen from "../screens/ChatsScreen";
+import ChatsScreen from "../screens/ChatsScreen/ChatsScreen";
 import TabTwoScreen from "../screens/TabTwoScreen";
 import { MainTabParamList, RootTabScreenProps } from "../types";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
