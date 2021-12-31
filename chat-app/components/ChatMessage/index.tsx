@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { Message } from "../../types";
 import moment from "moment";
@@ -6,13 +6,14 @@ import styles from "./styles";
 
 export type ChatMessageProps = {
   message: Message;
+  userID: String;
 };
 
 const ChatMessage = (props: ChatMessageProps) => {
-  const { message } = props;
+  const { message, userID } = props;
 
   const isMyMessage = () => {
-    return message.user.id === "u1";
+    return message.user.id === userID;
   };
 
   return (
