@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, FlatList } from "react-native";
-import { View } from "../../components/Themed";
-import ChatListItem from "../../components/ChatListItem";
+import { View } from "../components/Themed";
+import ChatListItem from "../components/ChatListItem";
 
-import NewMessageButton from "../../components/NewMessageButton";
+import NewMessageButton from "../components/NewMessageButton";
 import { API, Auth, graphqlOperation } from "aws-amplify";
 import { getUser } from "./queries";
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import styles from "./styles";
 import {
@@ -7,9 +7,26 @@ import {
   Entypo,
   Fontisto,
 } from "@expo/vector-icons";
+import { API, Auth, graphqlOperation } from "aws-amplify";
+import { createMessage } from "../../src/graphql/mutations";
 
-const InputBox = () => {
+export type InputBoxProps = {
+  chatRoomID: String;
+};
+
+const InputBox = (props: InputBoxProps) => {
+  const { chatRoomID } = props;
   const [message, setMessage] = useState("");
+  const [userID, setUserID] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userInfo = await Auth.currentAuthenticatedUser();
+      setUserID(userInfo.attributes.sub);
+    };
+
+    fetchUser();
+  }, []);
 
   const onPress = () => {
     if (!message) {
@@ -23,9 +40,21 @@ const InputBox = () => {
     console.log("mic pressed");
   };
 
-  const sendMessagePressed = () => {
-    console.log(`send message pressed ${message}`);
-    //Send message to backend...
+  const sendMessagePressed = async () => {
+    try {
+      await API.graphql(
+        graphqlOperation(createMessage, {
+          input: {
+            content: message,
+            userID: userID,
+            chatRoomID,
+          },
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
+
     setMessage("");
   };
 
